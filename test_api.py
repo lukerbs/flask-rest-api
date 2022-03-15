@@ -1,18 +1,49 @@
 import requests
 import time
 
-base = 'http://192.168.1.192:8003/'
-base = 'http://71.86.108.7:8003/'
-base = 'http://127.0.0.1:8003/'
+BASE = 'http://127.0.0.1:8003/api/'
+
+data = [
+	{"name":"Luke", "age": 26, "location":"San Juan Bautista"},
+	{"name":"Robert", "location":"Gilroy"},
+	{"name":"Hannah", "location":"Paicines"},
+	{"name":"Bella", "age": 25, "location":"San Juan Bautista"}
+	]
+
+
 
 # test put request
 # send data to server
-response = requests.put("http://127.0.0.1:8003/api/4150", {"name":"Luke Kerbs", "location":"San Juan Bautista"})
-print(response.json(), '\n')
+print('\n')
+print('PUT REQUEST - Adding Data to Database')
+for i in range(len(data)):
+	response = requests.put(BASE + str(i), data[i])
+	print(response.json(), '\n')
+	time.sleep(.1)
+print('\n\n')
 
-time.sleep(3)
+input('Go?')
 
 # test get repsonse
 # retrieve data fom server
-response = requests.get("http://127.0.0.1:8003/api/4150")
-print(response.json(), '\n')
+print('GET REQUEST - Retreiving Data from Database')
+for i in range(len(data)):
+	response = requests.get(BASE + str(i))
+	print(response.json(), '\n')
+print('\n\n')
+
+# input('Go?')
+
+# # API call to delete data
+# print("Delete REQUEST - Deleting user from database")
+# response = requests.delete(BASE + str(1))
+# print(response, '\n')
+# print('\n\n')
+
+# input('Go?')
+
+# # try 'getting' data again
+# # retrieve data fom server
+# for i in range(len(data)):
+# 	response = requests.get(BASE + str(i))
+	# print(response.json(), '\n')
