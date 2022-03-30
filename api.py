@@ -1,12 +1,19 @@
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse, abort, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy, model
+import argparse
+import os
+
+parser = argparse.ArgumentParser(description="Resets SQL database.")
+parser.add_argument('-r', '--reset', type=str, metavar='', required=False, help='Enter true / false')
+args = parser.parse_args()
 
 app = Flask(__name__)
 api = Api(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
+
 
 class UserModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -17,6 +24,14 @@ class UserModel(db.Model):
 
     def __repr__(self):
         return f"UserDataAPI(name={name}, name={name}, gender={gender}, location={location })"
+
+if args.reset == "true":
+    try:
+        os.system('rm database.db')
+    except:
+        pass
+    db.create_all()
+    print('New Database Created.')
 
 
 put_args = reqparse.RequestParser()
@@ -48,7 +63,7 @@ resource_fields = {
 class UserDataAPI(Resource):
     @marshal_with(resource_fields)
     def get(self, user_id):
-        result = UserModel.query.get(id=user_id)
+        result = UserModel.query.filter_by(id=user_id).first()
         return result 
 
     @marshal_with(resource_fields)
