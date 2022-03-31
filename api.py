@@ -40,7 +40,12 @@ put_args.add_argument("age", type=int, help="User age")
 put_args.add_argument("gender", type=str, help="User gender")
 put_args.add_argument("location", type=str, help="User location")
 
-
+user_update_args = reqparse.RequestParser()
+user_update_args.add_argument("name", type=str, help="User first and last name is required")
+user_update_args.add_argument("name", type=str, help="User first and last name is required")
+user_update_args.add_argument("age", type=int, help="User age")
+user_update_args.add_argument("gender", type=str, help="User gender")
+user_update_args.add_argument("location", type=str, help="User location")
 
 
 def user_not_found(user_id):
@@ -64,15 +69,41 @@ class UserDataAPI(Resource):
     @marshal_with(resource_fields)
     def get(self, user_id):
         result = UserModel.query.filter_by(id=user_id).first()
+        if not result:
+            abort(404, message="User id does not exist")
         return result 
 
     @marshal_with(resource_fields)
     def put(self, user_id):
-        args = put_args.parse_args() 
+        args = put_args.parse_args()
+        result = UserModel.query.filter_by(id=user_id).first()
+        if result:
+            abort(409, message="User id taken")
+
         user = UserModel(id=user_id, name=args['name'], age=args['age'], gender=args['gender'], location=args['location'] )
         db.session.add(user)
         db.session.commit()
         return user, 201
+
+    @marshal_with(resource_fields)
+    def patch(self, user_id):
+        args = user_update_args.parse_args()
+        result = UserModel.query.filter_by(id=user_id).first()
+        if not result:
+            abort(404, message="User does not exist, cannot update")
+        if args["name"]:
+            result.name = args['name']
+        if args["age"]:
+            result.age = args['age']
+        if args["gender"]:
+            result.gender = args['gender']
+        if args["location"]:
+            result.location = args['location']
+
+        db.session.commit()
+
+        return result
+
 
     def delete(self, user_id):
         user_not_found(user_id)
@@ -81,7 +112,7 @@ class UserDataAPI(Resource):
         return '', 204
 
 
-    # def post(self):
+    #def post(self):
     #     return {"data":"Posted"}
 
 api.add_resource(UserDataAPI, "/api/<string:user_id>")

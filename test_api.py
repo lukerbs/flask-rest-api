@@ -36,18 +36,41 @@ for i in range(len(data)):
 	print(response.json(), '\n')
 print('\n\n')
 
-# input('Go?')
+input('Go?')
 
-# # API call to delete data
-# print("Delete REQUEST - Deleting user from database")
-# response = requests.delete(BASE + str(1))
-# print(response, '\n')
-# print('\n\n')
+# API call to update data
+print('UPDATE REQUEST - Updating Data from Database')
+response = requests.patch(BASE + str(2), data={"name":"Hannah","age":24}, headers=headers)
+print(response.json(), '\n')
+print('\n\n')
 
-# input('Go?')
+input('Go?')
 
-# # try 'getting' data again
-# # retrieve data fom server
-# for i in range(len(data)):
-# 	response = requests.get(BASE + str(i))
-	# print(response.json(), '\n')
+# test get repsonse to verify update
+# retrieve data fom server
+print('GET REQUEST - Retreiving Data from Database')
+for i in range(len(data)):
+	response = requests.get(BASE + str(i))
+	print(response.json(), '\n')
+print('\n\n')
+
+input('Go?')
+
+# API call to delete data
+print("Delete REQUEST - Deleting user from database")
+response = requests.delete(BASE + str(1))
+print(response, '\n')
+print('\n\n')
+
+input('Go?')
+
+# try 'getting' data again
+# retrieve data fom server
+for i in range(len(data)):
+	try:
+		response = requests.get(BASE + str(i))
+		print(response.json(), '\n')
+	except:
+		print(f"ID:{i} does not exist")
+
+
