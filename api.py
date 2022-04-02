@@ -16,7 +16,7 @@ db = SQLAlchemy(app)
 
 
 class UserModel(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(20), primary_key=True)
     name = db.Column(db.String(100), nullable=False )
     age = db.Column(db.Integer, nullable=True)
     gender = db.Column(db.String(20), nullable=True)
@@ -58,7 +58,7 @@ def user_already_exists(user_id):
 
 
 resource_fields = {
-    'id': fields.Integer,
+    'id': fields.String,
     'name': fields.String,
     'age': fields.Integer,
     'gender': fields.String,
@@ -104,12 +104,14 @@ class UserDataAPI(Resource):
 
         return result
 
-
     def delete(self, user_id):
-        user_not_found(user_id)
-        del users[user_id]
-        print('Deleted User.')
-        return '', 204
+        result = UserModel.query.filter_by(id=user_id).first()
+        if not result:
+            abort(404, message="User id does not exist")
+        else:
+            db.session.delete(result)
+            db.session.commit()
+            return '', 204
 
 
     #def post(self):
